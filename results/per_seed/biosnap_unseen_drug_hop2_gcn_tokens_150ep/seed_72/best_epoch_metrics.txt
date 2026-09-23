@@ -1,0 +1,1 @@
+unseen_drug seed_72: best_epoch=89 | AUROC=0.8787 AUPRC=0.8835 F1=0.8055 Sens=0.8170 Spe=0.8020 Acc=0.8093

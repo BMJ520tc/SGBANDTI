@@ -1,0 +1,1 @@
+seed_72: best_epoch=110 AUROC=0.8805 AUPRC=0.8803 F1=0.7946 Sens=0.8557 Spe=0.7212 Acc=0.7862

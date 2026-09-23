@@ -1,0 +1,27 @@
+# Python 缓存
+__pycache__/
+*.py[cod]
+*.so
+
+# IDE 配置
+.idea/
+.vscode/
+.spyderproject
+.spyproject
+.ropeproject
+
+# 操作系统
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 环境与打包
+.venv/
+venv/
+env/
+build/
+dist/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/

@@ -1,0 +1,35 @@
+dataset,split,model,config,auroc_mean,auroc_std,auprc_mean,auprc_std,auroc_s42,auroc_s52,auroc_s62,auroc_s72,auroc_s82,auprc_s42,auprc_s52,auprc_s62,auprc_s72,auprc_s82,pred_file,true_file,source
+biosnap,random,SGBANDTI,full,0.9062,0.0019,0.9132,0.0043,0.9062,0.909,0.904,0.9065,0.9052,0.9171,0.918,0.9093,0.9086,0.913,stats_input/biosnap_random/SGBANDTI/,stats_input/biosnap_random/SGBANDTI/,stats_input/biosnap_random/SGBANDTI/seed_*_y_pred.npy（逐样本重算）
+bindingdb,random,SGBANDTI,full,0.962,0.001,0.9482,0.0017,0.9631,0.961,0.9617,0.961,0.9629,0.9488,0.9466,0.9468,0.9478,0.9508,stats_input/bindingdb_random/SGBANDTI/,stats_input/bindingdb_random/SGBANDTI/,stats_input/bindingdb_random/SGBANDTI/seed_*_y_pred.npy（逐样本重算）
+biosnap,unseen_drug,SGBANDTI,full,0.8794,0.0019,0.8821,0.0026,0.8801,0.8764,0.8813,0.8805,0.8785,0.882,0.8824,0.8861,0.8803,0.8795,stats_input/biosnap_unseen_drug/SGBANDTI/,stats_input/biosnap_unseen_drug/SGBANDTI/,stats_input/biosnap_unseen_drug/SGBANDTI/seed_*_y_pred.npy（逐样本重算）
+biosnap,unseen_target,SGBANDTI,full,0.6345,0.0182,0.6124,0.0212,0.6567,0.6154,0.6461,0.6167,0.6378,0.6282,0.5861,0.6355,0.5953,0.617,stats_input/biosnap_unseen_target/SGBANDTI/,stats_input/biosnap_unseen_target/SGBANDTI/,stats_input/biosnap_unseen_target/SGBANDTI/seed_*_y_pred.npy（逐样本重算）
+biosnap,random,SGBANDTI,no_subgraph,0.8757,0.0014,0.8782,0.0034,0.874,0.8754,0.8752,0.8761,0.8778,0.8794,0.8756,0.8738,0.8809,0.8815,,,result/biosnap_random_hop2_no_subgraph/seed_*/result_metrics.pt（本地复现）
+biosnap,random,SGBANDTI,no_ban,0.8777,0.0025,0.8759,0.0036,0.8803,0.8783,0.8736,0.8773,0.8789,0.8785,0.8776,0.8697,0.8778,0.8757,,,result/biosnap_random_hop2_no_ban/seed_*/result_metrics.pt（本地复现）
+biosnap,random,SGBANDTI,no_both,0.8598,0.0028,0.8551,0.0037,0.8581,0.8628,0.8603,0.8619,0.8559,0.8492,0.8553,0.8591,0.857,0.8549,,,result/biosnap_random_hop2_no_both/seed_*/result_metrics.pt（本地复现）
+biosnap,random,MGNDTI,full,0.8947,0.0019,0.8983,0.0042,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,random,MolTrans,full,0.8867,0.005,0.8927,0.0053,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,random,INGNN,full,0.8722,0.0006,0.8776,0.0013,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,random,TransformerCPI,full,0.8399,0.0068,0.8553,0.0048,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,random,RF,full,0.8402,0.0008,0.8678,0.0007,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,random,GNN-CPI,full,0.7094,0.0032,0.7247,0.0019,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+bindingdb,random,MGNDTI,full,0.95,0.0014,0.9326,0.0021,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+bindingdb,random,RF,full,0.9407,0.0004,0.9209,0.0005,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+bindingdb,random,MolTrans,full,0.9338,0.0017,0.9086,0.0054,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+bindingdb,random,INGNN,full,0.9228,0.0028,0.8951,0.0024,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+bindingdb,random,TransformerCPI,full,0.8921,0.0012,0.8556,0.0016,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+bindingdb,random,GNN-CPI,full,0.6548,0.1712,0.5782,0.2045,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,unseen_drug,MGNDTI,full,0.8589,0.0057,0.8675,0.0038,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,unseen_drug,RF,full,0.8493,0.0006,0.8724,0.0005,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,unseen_drug,TransformerCPI,full,0.846,0.0113,0.8551,0.0061,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,unseen_drug,INGNN,full,0.8417,0.0057,0.851,0.0023,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,unseen_drug,MolTrans,full,0.8407,0.0082,0.8473,0.0057,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,unseen_drug,GNN-CPI,full,0.6797,0.0897,0.6795,0.0933,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,unseen_target,RF,full,0.6979,0.011,0.6867,0.0068,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,unseen_target,MGNDTI,full,0.691,0.0105,0.6836,0.0168,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,unseen_target,MolTrans,full,0.682,0.0166,0.6788,0.0193,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,unseen_target,INGNN,full,0.6526,0.009,0.6421,0.0075,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,unseen_target,GNN-CPI,full,0.6501,0.003,0.6526,0.0017,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,unseen_target,TransformerCPI,full,0.616,0.0319,0.6032,0.0216,,,,,,,,,,,,,00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）
+biosnap,random,SGBANDTI,gcn_tokens,0.9051,0.0043,0.911,0.0068,0.9016,0.9046,0.9066,0.9117,0.901,0.9027,0.9132,0.9173,0.9171,0.9049,results/per_seed/biosnap_random_hop2_gcn_tokens_150ep/,,results/per_seed/biosnap_random_hop2_gcn_tokens_150ep/seed_*（逐样本/result_metrics 重算）
+biosnap,random,SGBANDTI,250ep,0.9097,0.0031,0.9175,0.0041,0.9105,0.9082,0.9058,0.9142,0.9097,0.9169,0.9177,0.9117,0.9233,0.9179,results/per_seed/biosnap_random_hop2_250ep/,,results/per_seed/biosnap_random_hop2_250ep/seed_*（逐样本/result_metrics 重算）
+biosnap,unseen_drug,SGBANDTI,gcn_tokens,0.876,0.0035,0.8818,0.0039,0.8706,0.8789,0.8743,0.8787,0.8776,0.8761,0.8863,0.8832,0.8835,0.8799,results/per_seed/biosnap_unseen_drug_hop2_gcn_tokens_150ep/,,results/per_seed/biosnap_unseen_drug_hop2_gcn_tokens_150ep/seed_*（逐样本/result_metrics 重算）
