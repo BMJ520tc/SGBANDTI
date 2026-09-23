@@ -29,9 +29,9 @@ SGBANDTI/
 │   ├── aggregate_seeds.py    # 5 种子聚合
 │   ├── build_manifest.py     # 生成唯一结果清单 results_manifest.csv
 │   └── 运行说明.md           # 复现步骤
-├── baselines/                # 对比基线代码（6 个，见 README 基线节）
+├── baselines/                # 对比基线代码（7 个，见 README 基线节）
 │   ├── MolTrans/  MGNDTI/  INGNN/  TransformerCPI/
-│   ├── GNN-CPI/  RF/
+│   ├── GNN-CPI/  RF/  DrugBAN/
 ├── data/                     # 固定 train/val/test 划分（7:1:2，canonical 防泄漏）
 │   ├── biosnap/{random, unseen_drug, unseen_target}
 │   └── bindingdb/random
@@ -144,7 +144,7 @@ python demo_eval.py        # 需先建好子图缓存（见 Data 节）
 
 ## Baselines
 
-`baselines/` 提供 6 个对比基线代码（MolTrans / MGNDTI / INGNN / TransformerCPI / GNN-CPI / RF），均已适配同一去重数据、5 种子 42–82 与统一指标口径（标准 F1/阈值=验证集选优）。各基线来源与适配说明：
+`baselines/` 提供 7 个对比基线代码（MolTrans / MGNDTI / INGNN / TransformerCPI / GNN-CPI / RF / DrugBAN），均已适配同一去重数据、5 种子 42–82 与统一指标口径（标准 F1/阈值=验证集选优）。各基线来源与适配说明：
 
 | 基线 | 官方仓库 | 适配 |
 |---|---|---|
@@ -154,6 +154,7 @@ python demo_eval.py        # 需先建好子图缓存（见 Data 节）
 | TransformerCPI | github.com/lucian02/TransformerCPI | `--data` 切换、冷启动支持 |
 | GNN-CPI | github.com/IBM/Interpretable-... (CPI) | seeds 42–82 |
 | RF | 自实现（RDKit 特征 + 随机森林） | 统一阈值协议 |
+| DrugBAN | github.com/peizhenbai/DrugBAN | `--data/--split/--seeds` 支持；随包不含其自带 datasets/ |
 
 ---
 

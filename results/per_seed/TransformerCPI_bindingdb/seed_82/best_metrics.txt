@@ -1,0 +1,2 @@
+Epoch	Time(sec)	Loss_train	AUC_dev	AUROC_test	AUPRC_test	F1_test	Sensitivity_test	Specificity_test	Accuracy_test
+20	9261.67	212.4745	0.8967	0.8907	0.8546	0.7828	0.8198	0.8059	0.8117

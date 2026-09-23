@@ -26,6 +26,7 @@ _C.BCN.HEADS = 2
 _C.ABLATION = CN()
 _C.ABLATION.USE_SUBGRAPH = True   # False -> standard GCN drug encoder (整分子池化)
 _C.ABLATION.USE_BAN = True        # False -> concat+MLP fusion
+_C.ABLATION.USE_GCN_TOKENS = False  # True -> standard GCN atom tokens (无子图, 保留 [B,290,128])
 
 # MLP decoder
 _C.DECODER = CN()

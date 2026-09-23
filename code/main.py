@@ -20,8 +20,8 @@ parser.add_argument('--data', default='biosnap', type=str, metavar='TASK',
 parser.add_argument('--split', default='random', type=str, metavar='S', help="split task", choices=['random', 'cold', 'cluster', 'unseen_drug', 'unseen_target'])
 parser.add_argument('--hop', default=2, type=int, metavar='H', help='k-hop subgraph size for NestedGNN cache')
 parser.add_argument('--ablation', default='full', type=str, metavar='A',
-                    help='ablation: full | no_subgraph | no_ban | no_both',
-                    choices=['full', 'no_subgraph', 'no_ban', 'no_both'])
+                    help='ablation: full | no_subgraph | no_ban | no_both | gcn_tokens',
+                    choices=['full', 'no_subgraph', 'no_ban', 'no_both', 'gcn_tokens'])
 parser.add_argument('--seeds', default=None, type=str, metavar='S',
                     help="comma-separated seed list to override defaults, e.g. 82 或 42,52")
 parser.add_argument('--dropout', default=None, type=float, metavar='P',
@@ -50,10 +50,12 @@ if args.seeds:
 
 
 def apply_ablation(cfg):
-    if args.ablation in ('no_subgraph', 'no_both'):
+    if args.ablation in ('no_subgraph', 'no_both', 'gcn_tokens'):
         cfg.ABLATION.USE_SUBGRAPH = False
     if args.ablation in ('no_ban', 'no_both'):
         cfg.ABLATION.USE_BAN = False
+    if args.ablation == 'gcn_tokens':
+        cfg.ABLATION.USE_GCN_TOKENS = True
     return cfg
 
 

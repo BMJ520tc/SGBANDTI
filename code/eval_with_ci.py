@@ -57,10 +57,12 @@ def find_best_checkpoint():
 def main():
     torch.cuda.empty_cache()
     cfg = get_cfg_defaults()
-    if args.ablation in ("no_subgraph", "no_both"):
+    if args.ablation in ("no_subgraph", "no_both", "gcn_tokens"):
         cfg.ABLATION.USE_SUBGRAPH = False
     if args.ablation in ("no_ban", "no_both"):
         cfg.ABLATION.USE_BAN = False
+    if args.ablation == "gcn_tokens":
+        cfg.ABLATION.USE_GCN_TOKENS = True
     cfg.SOLVER.SEED = args.seed
     set_seed(args.seed)
     ckpt = args.checkpoint or find_best_checkpoint()

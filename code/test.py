@@ -58,8 +58,8 @@ parser.add_argument(
     default="full",
     type=str,
     metavar="A",
-    help="ablation variant: full | no_subgraph | no_ban | no_both",
-    choices=["full", "no_subgraph", "no_ban", "no_both"],
+    help="ablation variant: full | no_subgraph | no_ban | no_both | gcn_tokens",
+    choices=["full", "no_subgraph", "no_ban", "no_both", "gcn_tokens"],
 )
 args = parser.parse_args()
 
@@ -69,10 +69,12 @@ def ablation_tag():
 
 
 def apply_ablation(cfg):
-    if args.ablation in ("no_subgraph", "no_both"):
+    if args.ablation in ("no_subgraph", "no_both", "gcn_tokens"):
         cfg.ABLATION.USE_SUBGRAPH = False
     if args.ablation in ("no_ban", "no_both"):
         cfg.ABLATION.USE_BAN = False
+    if args.ablation == "gcn_tokens":
+        cfg.ABLATION.USE_GCN_TOKENS = True
     return cfg
 
 

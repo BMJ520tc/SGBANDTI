@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 from torch_scatter import scatter_min
-from gcn import NestedGCN, MolecularGCNStd
+from gcn import NestedGCN, MolecularGCNStd, MolecularGCNTokens
 from ban import BANLayer as BCNet
 from torch.nn.utils.weight_norm import weight_norm
 
@@ -35,6 +35,7 @@ class SGBANDTI(nn.Module):
         ban_heads = config["BCN"]["HEADS"]
         self.use_subgraph = config["ABLATION"]["USE_SUBGRAPH"]
         self.use_ban = config["ABLATION"]["USE_BAN"]
+        self.use_gcn_tokens = config["ABLATION"]["USE_GCN_TOKENS"]
 
         if self.use_subgraph:
             self.drug_extractor = MolecularGCN(
@@ -43,6 +44,15 @@ class SGBANDTI(nn.Module):
                 hidden_feats=drug_hidden_feats,
                 max_nodes=drug_max_nodes,
                 num_layers=drug_num_layers
+            )
+        elif self.use_gcn_tokens:
+            # P0-1 对照：标准 GCN 逐原子 token（无子图，保留 [B,290,128]）
+            self.drug_extractor = MolecularGCNTokens(
+                in_feats=drug_in_feats,
+                dim_embedding=drug_embedding,
+                hidden=drug_hidden_feats,
+                num_layers=drug_num_layers,
+                max_nodes=drug_max_nodes
             )
         else:
             # 消融：标准 GCN（整分子消息传递 + 真实节点 mean 池化）

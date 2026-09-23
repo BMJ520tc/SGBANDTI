@@ -1,6 +1,6 @@
 # Baselines（对比基线复现说明）
 
-> 6 个基线均已适配：**同一去重 canonical 数据、5 种子 42–82、统一指标口径**（标准 F1、阈值=验证集选优）。
+> 7 个基线均已适配：**同一去重 canonical 数据、5 种子 42–82、统一指标口径**（标准 F1、阈值=验证集选优）。
 > 各基线目录内含其官方代码与文档；本文件说明如何在本仓库数据上复现。
 > 数据源：`../data/`（BioSNAP random/unseen_drug/unseen_target + BindingDB random）。使用前将对应 CSV 放入各基线预期目录（见下）。
 
@@ -24,6 +24,7 @@
 | **TransformerCPI** | `dataset/biosnap/random`、`dataset/bindingdb/random` | `python main_glu.py --data biosnap --seeds 42,52,62,72,82` |
 | **GNN-CPI** | `dataset/{biosnap,bindingdb}/random` | `python run_training.py biosnap 2 3 10 3 11 3 3 0.001 0.5 10 0.000001 60 <setting> 42,52,62,72,82` |
 | **RF** | `dataset/biosnap/random`、`dataset/bindingdb/random` | `python dti_prediction_bio.py biosnap` |
+| **DrugBAN** | `datasets/{biosnap,bindingdb}/{random,unseen_drug,unseen_target}`（本仓库未随包分发 DrugBAN 自带的 datasets/，需从 `../data/` 拷入） | `python main.py --cfg configs/DrugBAN.yaml --data biosnap --split random --seeds 42,52,62,72,82` |
 
 > 注意：各基线数据路径为相对路径，需从其各自目录下运行；冷启动（unseen_drug/unseen_target）对应数据放对应目录即可。
 > 各基线结果与逐种子明细见 `../results/`。
@@ -41,5 +42,6 @@
 | **TransformerCPI** | 每 seed best model | 验证集 AUC 最优 | main_glu.py: `best_model_seed_{seed}.pt` |
 | **GNN-CPI** | 验证集 AUPRC 最优 | 验证集 AUPRC 最优 | run_training.py:428-458 |
 | **RF** | 无（单模型） | 验证集 F1 最优 | dti_prediction_bio.py |
+| **DrugBAN** | 验证集 AUROC 最优 | PR 曲线最优阈值（标准 F1） | trainer.py:117 `if auroc >= self.best_auroc`；:345 `thred_optim = pr_thresholds[best_idx]` |
 
 > **风险提示**：INGNN 固定阈值 0.5、MolTrans 用验证集 F1、GNN-CPI 用验证集 AUPRC——三者阈值协议互不相同，这正是主表仅保留 AUROC/AUPRC 的原因。如需严格统一阈值依赖指标，需从各基线逐样本预测用统一脚本重算。

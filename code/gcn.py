@@ -154,6 +154,36 @@ class MolecularGCNStd(nn.Module):
         return x_graph.unsqueeze(1), torch.ones(B, 1, device=x_graph.device)
 
 
+class MolecularGCNTokens(nn.Module):
+    """标准 GCN 逐原子 token 编码器（P0-1 对照：无显式子图提取，保留 [B, max_nodes, hidden] 原子 token）。
+    与完整配置共享 drug mask 与 BAN，仅移除 k-hop 子图提取。"""
+    def __init__(self, in_feats, dim_embedding=128, hidden=128, num_layers=3, max_nodes=290):
+        super(MolecularGCNTokens, self).__init__()
+        self.init_transform = nn.Linear(in_feats, dim_embedding, bias=False)
+        self.conv_layers = nn.ModuleList()
+        self.conv_layers.append(dglnn.GraphConv(dim_embedding, hidden, activation=F.relu))
+        for _ in range(num_layers - 1):
+            self.conv_layers.append(dglnn.GraphConv(hidden, hidden, activation=F.relu))
+        self.lin1 = nn.Linear(num_layers * hidden, hidden)
+        self.max_nodes = max_nodes
+        self.output_feats = hidden
+
+    def forward(self, batch_graph):
+        node_feats = batch_graph.ndata['h']
+        real_flag = (node_feats[:, -1] < 0.5).float()
+        node_feats = self.init_transform(node_feats)
+        xs = []
+        for conv in self.conv_layers:
+            node_feats = conv(batch_graph, node_feats)
+            xs.append(node_feats)
+        x = torch.cat(xs, dim=1)
+        x = self.lin1(x)
+        B = int(batch_graph.batch_size)  # flat 整分子图: batch_size = 分子数
+        feats = x.view(B, self.max_nodes, self.output_feats)
+        mask = real_flag.view(B, self.max_nodes)
+        return feats, mask
+
+
 class GCN(nn.Module):
     """
     标准GCN模型，适配DGL格式
