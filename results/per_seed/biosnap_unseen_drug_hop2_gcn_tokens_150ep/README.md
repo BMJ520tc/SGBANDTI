@@ -26,7 +26,7 @@
 - [x] 五组 test_y_true.npy / test_y_pred.npy
 - [x] 五个 result_metrics.pt + best checkpoint + best_epoch_metrics.txt
 - [x] 运行日志：`run_bcombo_B机日志.log`（B机，16.8MB）+ 本机 seed42/52/62 训练日志
-- [x] 代码 commit：本机主仓库 `e77cbcd`；上传包 `f5a3fba`
+- [x] 代码 commit：公开仓库 `08a9dbb`（本目录全部文件均由该提交引入）；训练发生在私有工作仓库 `e77cbcd`（该 commit 不在公开仓库中，仅作来源留痕）
 - [x] unseen_drug CSV SHA256（见下）
 
 ## unseen_drug CSV SHA256

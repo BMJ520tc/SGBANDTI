@@ -154,7 +154,7 @@ python demo_eval.py        # 需先建好子图缓存（见 Data 节）
 | TransformerCPI | github.com/lucian02/TransformerCPI | `--data` 切换、冷启动支持 |
 | GNN-CPI | github.com/IBM/Interpretable-... (CPI) | seeds 42–82 |
 | RF | 自实现（RDKit 特征 + 随机森林） | 统一阈值协议 |
-| DrugBAN | github.com/peizhenbai/DrugBAN | `--data/--split/--seeds` 支持；随包不含其自带 datasets/ |
+| DrugBAN | github.com/peizhenbai/DrugBAN（commit `9923f8c`） | `--data/--split/--seeds` 支持、标准 F1 与 sens/spec 修正；适配 patch 与证据见 `baselines/DrugBAN/EVIDENCE.md`；随包不含其自带 datasets/ |
 
 ---
 

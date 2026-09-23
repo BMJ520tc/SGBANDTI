@@ -1,5 +1,10 @@
 {
- "git_commit": "5d93e6c89213c747a6d958a2012885327a03710a",
+ "git_commit": "08a9dbb42fe7840267c350da6fd1585cf2d4dbdc",
+ "git_commit_note": "公开仓库中引入 data/ 的提交（投稿版）。原始冻结发生于私有工作仓库 commit 5d93e6c89213c747a6d958a2012885327a03710a（该 commit 不在公开仓库中，仅作来源留痕）。",
+ "hash_algorithm": "md5",
+ "hash_normalization": "LF",
+ "hash_note": "hash 一律按 LF(\\n) 行尾口径计算。本仓库以 core.autocrlf=true checkout，Windows 工作区 CSV 为 CRLF，直接对工作区文件算 md5 会不符；复核请先 tr -d '\\r'，或直接比对 blob。",
+ "blob_note": "blob 为 git blob SHA-1，与行尾无关，复核：git rev-parse HEAD:<path>",
  "note": "冻结的最终 split；任何数据变化都会导致哈希改变",
  "splits": {
   "bindingdb/random": {
@@ -7,6 +12,11 @@
     "train": "5c3f4eede73965b9b67dd57aceb850e9",
     "val": "9d4dafe2c4e598f43b87d210719566cd",
     "test": "cdcfc9e882355180ee36ff043de794ba"
+   },
+   "blob": {
+    "train": "07d1907f7aada58311126b776381491aabe4f388",
+    "val": "f099397a181c5ffb68d6c737079355bed1cfe403",
+    "test": "a8db463509c3e702231c97a7dcec9291c496950e"
    },
    "counts": {
     "samples": {
@@ -22,9 +32,14 @@
   },
   "biosnap/random": {
    "hash": {
-    "train": "81fad27b7b412a0414df6caec20c662a",
-    "val": "ae82621e3788ee7b8b854658d359c420",
-    "test": "a9303219466496ec1f30578cc7ddb9e5"
+    "train": "f5b232deb97ae36c50fee59117fcd26e",
+    "val": "452f33340abaa6e42f1a00b13b9e9f91",
+    "test": "1426fdeb57fd1cf63a18275e73dbdc9b"
+   },
+   "blob": {
+    "train": "4a0bc6514ea2a9da5fe37d7c0f4456b55626e294",
+    "val": "11da782a4b533244b12527d8c42eaaa78ae7eb0c",
+    "test": "07c87ce20136ab93e8e4e2963e2aa40111ec14e0"
    },
    "counts": {
     "samples": {
@@ -40,9 +55,14 @@
   },
   "biosnap/unseen_drug": {
    "hash": {
-    "train": "85a335679862ddf0fed18acd6014aebe",
-    "val": "84d9c2587ad70f010a329b7d417cc6da",
-    "test": "9309f6201dffc5d643d6a4f723233dd2"
+    "train": "b576e0bc7efcbe2dd9db994f15dbc60c",
+    "val": "afe9ec28cec0711b16c19609c3c23911",
+    "test": "5af9ddfc3d053806bfd553ab40dd4e13"
+   },
+   "blob": {
+    "train": "6f3ed2cc79ec8ce8a1d86758ac1ff89c1f2a9df7",
+    "val": "50c32aeda60c206300db9c1ebb455f92af1f1f8d",
+    "test": "7c81eae4333afa0ffa862c554a64418c25fbb58a"
    },
    "counts": {
     "samples": {
@@ -58,9 +78,14 @@
   },
   "biosnap/unseen_target": {
    "hash": {
-    "train": "9ba54b7dd3715053d98bb536fa58c047",
-    "val": "6250bdebd5b287eb0cd0213f9fc7c9c7",
-    "test": "e7d380e7cc6fe3d9cd58444d1b9606bb"
+    "train": "a501bf4dcdfc9a5650321f035985ee65",
+    "val": "8fae45322de832dee04cb155282d82fc",
+    "test": "1e35c17ce1c87bcfb93f32a1557f7df4"
+   },
+   "blob": {
+    "train": "636bc979174ac93e1a9d657076aeee217b7de268",
+    "val": "cdb7424a6727c036acd88414edd8a8f6bb6522cd",
+    "test": "2721ed83c22074f860f17df4bf7c85c17a92e3ca"
    },
    "counts": {
     "samples": {

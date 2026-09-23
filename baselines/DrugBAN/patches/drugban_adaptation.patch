@@ -1,0 +1,277 @@
+diff --git a/main.py b/main.py
+index 68f8e72..989981a 100644
+--- a/main.py
++++ b/main.py
+@@ -23,7 +23,9 @@ parser = argparse.ArgumentParser(description="DrugBAN for DTI prediction")
+ parser.add_argument('--cfg', required=True, help="path to config file", type=str)
+ parser.add_argument('--data', required=True, type=str, metavar='TASK',
+                     help='dataset')
+-parser.add_argument('--split', default='random', type=str, metavar='S', help="split task", choices=['random', 'cold', 'cluster'])
++parser.add_argument('--split', default='random', type=str, metavar='S', help="split task", choices=['random', 'cold', 'cluster', 'unseen_drug', 'unseen_target'])
++parser.add_argument('--seeds', default=None, type=str, metavar='SEEDS',
++                    help="comma-separated seeds, e.g. 82 or 42,52,62,72,82")
+ args = parser.parse_args()
+ 
+ 
+@@ -32,128 +34,104 @@ def main():
+     warnings.filterwarnings("ignore", message="invalid value encountered in divide")
+     cfg = get_cfg_defaults()
+     cfg.merge_from_file(args.cfg)
+-    set_seed(cfg.SOLVER.SEED)
+-    suffix = str(int(time() * 1000))[6:]
+-    mkdir(cfg.RESULT.OUTPUT_DIR)
+-    experiment = None
++
++    seeds = [int(s) for s in args.seeds.split(',')] if args.seeds else [42, 52, 62, 72, 82]
++    base_out = cfg.RESULT.OUTPUT_DIR
+     print(f"Config yaml: {args.cfg}")
+-    print(f"Hyperparameters: {dict(cfg)}")
++    print(f"Seeds: {seeds}")
+     print(f"Running on: {device}", end="\n\n")
+ 
+-    dataFolder = f'./datasets/{args.data}'
+-    dataFolder = os.path.join(dataFolder, str(args.split))
+-
+-    if not cfg.DA.TASK:
+-        train_path = os.path.join(dataFolder, 'train.csv')
+-        val_path = os.path.join(dataFolder, "val.csv")
+-        test_path = os.path.join(dataFolder, "test.csv")
+-        df_train = pd.read_csv(train_path)
+-        df_val = pd.read_csv(val_path)
+-        df_test = pd.read_csv(test_path)
+-
+-        train_dataset = DTIDataset(df_train.index.values, df_train)
+-        val_dataset = DTIDataset(df_val.index.values, df_val)
+-        test_dataset = DTIDataset(df_test.index.values, df_test)
+-    else:
+-        train_source_path = os.path.join(dataFolder, 'source_train.csv')
+-        train_target_path = os.path.join(dataFolder, 'target_train.csv')
+-        test_target_path = os.path.join(dataFolder, 'target_test.csv')
+-        df_train_source = pd.read_csv(train_source_path)
+-        df_train_target = pd.read_csv(train_target_path)
+-        df_test_target = pd.read_csv(test_target_path)
+-
+-        train_dataset = DTIDataset(df_train_source.index.values, df_train_source)
+-        train_target_dataset = DTIDataset(df_train_target.index.values, df_train_target)
+-        test_target_dataset = DTIDataset(df_test_target.index.values, df_test_target)
+-
+-    if cfg.COMET.USE and comet_support:
+-        experiment = Experiment(
+-            project_name=cfg.COMET.PROJECT_NAME,
+-            workspace=cfg.COMET.WORKSPACE,
+-            auto_output_logging="simple",
+-            log_graph=True,
+-            log_code=False,
+-            log_git_metadata=False,
+-            log_git_patch=False,
+-            auto_param_logging=False,
+-            auto_metric_logging=False
+-        )
+-        hyper_params = {
+-            "LR": cfg.SOLVER.LR,
+-            "Output_dir": cfg.RESULT.OUTPUT_DIR,
+-            "DA_use": cfg.DA.USE,
+-            "DA_task": cfg.DA.TASK,
+-        }
+-        if cfg.DA.USE:
+-            da_hyper_params = {
+-                "DA_init_epoch": cfg.DA.INIT_EPOCH,
+-                "Use_DA_entropy": cfg.DA.USE_ENTROPY,
+-                "Random_layer": cfg.DA.RANDOM_LAYER,
+-                "Original_random": cfg.DA.ORIGINAL_RANDOM,
+-                "DA_optim_lr": cfg.SOLVER.DA_LR
+-            }
+-            hyper_params.update(da_hyper_params)
+-        experiment.log_parameters(hyper_params)
+-        if cfg.COMET.TAG is not None:
+-            experiment.add_tag(cfg.COMET.TAG)
+-        experiment.set_name(f"{args.data}_{suffix}")
+-
+-    params = {'batch_size': cfg.SOLVER.BATCH_SIZE, 'shuffle': True, 'num_workers': cfg.SOLVER.NUM_WORKERS,
+-              'drop_last': True, 'collate_fn': graph_collate_func}
+-
+-    if not cfg.DA.USE:
+-        training_generator = DataLoader(train_dataset, **params)
+-        params['shuffle'] = False
+-        params['drop_last'] = False
++    all_results = []
++    for seed in seeds:
++        print(f"\n{'='*50}\nSeed: {seed}\n{'='*50}")
++        torch.cuda.empty_cache()
++        set_seed(seed)
++        cfg.SOLVER.SEED = seed
++        cfg.RESULT.OUTPUT_DIR = os.path.join(base_out, f"seed_{seed}")
++        mkdir(cfg.RESULT.OUTPUT_DIR)
++        experiment = None
++
++        dataFolder = os.path.join('./datasets', args.data, str(args.split))
++
+         if not cfg.DA.TASK:
+-            val_generator = DataLoader(val_dataset, **params)
+-            test_generator = DataLoader(test_dataset, **params)
++            train_path = os.path.join(dataFolder, 'train.csv')
++            val_path = os.path.join(dataFolder, "val.csv")
++            test_path = os.path.join(dataFolder, "test.csv")
++            df_train = pd.read_csv(train_path)
++            df_val = pd.read_csv(val_path)
++            df_test = pd.read_csv(test_path)
++            train_dataset = DTIDataset(df_train.index.values, df_train)
++            val_dataset = DTIDataset(df_val.index.values, df_val)
++            test_dataset = DTIDataset(df_test.index.values, df_test)
++        else:
++            train_source_path = os.path.join(dataFolder, 'source_train.csv')
++            train_target_path = os.path.join(dataFolder, 'target_train.csv')
++            test_target_path = os.path.join(dataFolder, 'target_test.csv')
++            df_train_source = pd.read_csv(train_source_path)
++            df_train_target = pd.read_csv(train_target_path)
++            df_test_target = pd.read_csv(test_target_path)
++            train_dataset = DTIDataset(df_train_source.index.values, df_train_source)
++            train_target_dataset = DTIDataset(df_train_target.index.values, df_train_target)
++            test_target_dataset = DTIDataset(df_test_target.index.values, df_test_target)
++
++        params = {'batch_size': cfg.SOLVER.BATCH_SIZE, 'shuffle': True, 'num_workers': cfg.SOLVER.NUM_WORKERS,
++                  'drop_last': True, 'collate_fn': graph_collate_func}
++
++        if not cfg.DA.USE:
++            training_generator = DataLoader(train_dataset, **params)
++            params['shuffle'] = False
++            params['drop_last'] = False
++            if not cfg.DA.TASK:
++                val_generator = DataLoader(val_dataset, **params)
++                test_generator = DataLoader(test_dataset, **params)
++            else:
++                val_generator = DataLoader(test_target_dataset, **params)
++                test_generator = DataLoader(test_target_dataset, **params)
+         else:
++            source_generator = DataLoader(train_dataset, **params)
++            target_generator = DataLoader(train_target_dataset, **params)
++            n_batches = max(len(source_generator), len(target_generator))
++            multi_generator = MultiDataLoader(dataloaders=[source_generator, target_generator], n_batches=n_batches)
++            params['shuffle'] = False
++            params['drop_last'] = False
+             val_generator = DataLoader(test_target_dataset, **params)
+             test_generator = DataLoader(test_target_dataset, **params)
+-    else:
+-        source_generator = DataLoader(train_dataset, **params)
+-        target_generator = DataLoader(train_target_dataset, **params)
+-        n_batches = max(len(source_generator), len(target_generator))
+-        multi_generator = MultiDataLoader(dataloaders=[source_generator, target_generator], n_batches=n_batches)
+-        params['shuffle'] = False
+-        params['drop_last'] = False
+-        val_generator = DataLoader(test_target_dataset, **params)
+-        test_generator = DataLoader(test_target_dataset, **params)
+-
+-    model = DrugBAN(**cfg).to(device)
+-
+-    if cfg.DA.USE:
+-        if cfg["DA"]["RANDOM_LAYER"]:
+-            domain_dmm = Discriminator(input_size=cfg["DA"]["RANDOM_DIM"], n_class=cfg["DECODER"]["BINARY"]).to(device)
++
++        model = DrugBAN(**cfg).to(device)
++
++        if cfg.DA.USE:
++            if cfg["DA"]["RANDOM_LAYER"]:
++                domain_dmm = Discriminator(input_size=cfg["DA"]["RANDOM_DIM"], n_class=cfg["DECODER"]["BINARY"]).to(device)
++            else:
++                domain_dmm = Discriminator(input_size=cfg["DECODER"]["IN_DIM"] * cfg["DECODER"]["BINARY"],
++                                           n_class=cfg["DECODER"]["BINARY"]).to(device)
++            opt = torch.optim.Adam(model.parameters(), lr=cfg.SOLVER.LR)
++            opt_da = torch.optim.Adam(domain_dmm.parameters(), lr=cfg.SOLVER.DA_LR)
++        else:
++            opt = torch.optim.Adam(model.parameters(), lr=cfg.SOLVER.LR)
++            opt_da = None
++            domain_dmm = None
++
++        torch.backends.cudnn.benchmark = True
++
++        if not cfg.DA.USE:
++            trainer = Trainer(model, opt, device, training_generator, val_generator, test_generator, opt_da=None,
++                              discriminator=None, experiment=experiment, **cfg)
+         else:
+-            domain_dmm = Discriminator(input_size=cfg["DECODER"]["IN_DIM"] * cfg["DECODER"]["BINARY"],
+-                                       n_class=cfg["DECODER"]["BINARY"]).to(device)
+-        # params = list(model.parameters()) + list(domain_dmm.parameters())
+-        opt = torch.optim.Adam(model.parameters(), lr=cfg.SOLVER.LR)
+-        opt_da = torch.optim.Adam(domain_dmm.parameters(), lr=cfg.SOLVER.DA_LR)
+-    else:
+-        opt = torch.optim.Adam(model.parameters(), lr=cfg.SOLVER.LR)
+-
+-    torch.backends.cudnn.benchmark = True
+-
+-    if not cfg.DA.USE:
+-        trainer = Trainer(model, opt, device, training_generator, val_generator, test_generator, opt_da=None,
+-                          discriminator=None,
+-                          experiment=experiment, **cfg)
+-    else:
+-        trainer = Trainer(model, opt, device, multi_generator, val_generator, test_generator, opt_da=opt_da,
+-                          discriminator=domain_dmm,
+-                          experiment=experiment, **cfg)
+-    result = trainer.train()
+-
+-    with open(os.path.join(cfg.RESULT.OUTPUT_DIR, "model_architecture.txt"), "w") as wf:
+-        wf.write(str(model))
+-
+-    print()
+-    print(f"Directory for saving result: {cfg.RESULT.OUTPUT_DIR}")
+-
+-    return result
++            trainer = Trainer(model, opt, device, multi_generator, val_generator, test_generator, opt_da=opt_da,
++                              discriminator=domain_dmm, experiment=experiment, **cfg)
++        result = trainer.train()
++        result["seed"] = seed
++        all_results.append(result)
++
++        with open(os.path.join(cfg.RESULT.OUTPUT_DIR, "model_architecture.txt"), "w") as wf:
++            wf.write(str(model))
++        print(f"Directory for saving result: {cfg.RESULT.OUTPUT_DIR}")
++
++    summary = pd.DataFrame(all_results)
++    print("\n=== Seed Summary ===")
++    print(summary.to_string(index=False))
++    return all_results
+ 
+ 
+ if __name__ == '__main__':
+diff --git a/trainer.py b/trainer.py
+index 82c9b4a..a74c7f2 100644
+--- a/trainer.py
++++ b/trainer.py
+@@ -3,7 +3,7 @@ import torch.nn as nn
+ import copy
+ import os
+ import numpy as np
+-from sklearn.metrics import roc_auc_score, average_precision_score, roc_curve, confusion_matrix, precision_recall_curve, precision_score
++from sklearn.metrics import roc_auc_score, average_precision_score, roc_curve, confusion_matrix, precision_recall_curve, precision_score, f1_score
+ from models import binary_cross_entropy, cross_entropy_logits, entropy_logits, RandomLayer
+ from prettytable import PrettyTable
+ from domain_adaptator import ReverseLayerF
+@@ -338,19 +338,22 @@ class Trainer(object):
+ 
+         if dataloader == "test":
+             fpr, tpr, thresholds = roc_curve(y_label, y_pred)
+-            prec, recall, _ = precision_recall_curve(y_label, y_pred)
+-            precision = tpr / (tpr + fpr)
+-            f1 = 2 * precision * tpr / (tpr + precision + 0.00001)
+-            thred_optim = thresholds[5:][np.argmax(f1[5:])]
++            prec, recall, pr_thresholds = precision_recall_curve(y_label, y_pred)
++            # standard F1 on the PR curve; pick the threshold that maximizes it
++            f1_pr = 2 * prec * recall / (prec + recall + 1e-12)
++            best_idx = np.argmax(f1_pr[:-1])
++            thred_optim = pr_thresholds[best_idx]
+             y_pred_s = [1 if i else 0 for i in (y_pred >= thred_optim)]
+             cm1 = confusion_matrix(y_label, y_pred_s)
+             accuracy = (cm1[0, 0] + cm1[1, 1]) / sum(sum(cm1))
+-            sensitivity = cm1[0, 0] / (cm1[0, 0] + cm1[0, 1])
+-            specificity = cm1[1, 1] / (cm1[1, 0] + cm1[1, 1])
++            # sklearn confusion_matrix layout: [[TN, FP], [FN, TP]]
++            sensitivity = cm1[1, 1] / (cm1[1, 0] + cm1[1, 1])
++            specificity = cm1[0, 0] / (cm1[0, 0] + cm1[0, 1])
+             if self.experiment:
+                 self.experiment.log_curve("test_roc curve", fpr, tpr)
+                 self.experiment.log_curve("test_pr curve", recall, prec)
+             precision1 = precision_score(y_label, y_pred_s)
+-            return auroc, auprc, np.max(f1[5:]), sensitivity, specificity, accuracy, test_loss, thred_optim, precision1
++            f1_standard = f1_score(y_label, y_pred_s)
++            return auroc, auprc, f1_standard, sensitivity, specificity, accuracy, test_loss, thred_optim, precision1
+         else:
+             return auroc, auprc, test_loss
