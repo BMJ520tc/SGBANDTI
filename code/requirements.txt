@@ -1,4 +1,5 @@
-# Core project dependencies inferred from the current codebase.
+# Core project dependencies. Versions pinned to the environment that produced the reported results
+# (conda env `sgbandti`, Python 3.10). Kept in sync with environment.yml at the repository root.
 numpy==1.26.4
 pandas==2.3.3
 scikit-learn==1.6.1
@@ -7,17 +8,26 @@ prettytable==3.16.0
 tqdm==4.67.3
 yacs==0.1.8
 
-# Deep learning / graph stack
-torch==2.1.0
+# Deep learning / graph stack（CUDA 12.1 轮子）
+torch==2.1.0+cu121
 dgl==2.2.1+cu121
 dgllife==0.3.2
 torch-geometric==2.6.1
 torch-scatter==2.1.2+pt21cu121
 
-# 分子处理（dgllife 依赖，需单独安装）
-rdkit
+# dgl 2.2.1 的运行时依赖（pip 不会自动装全）
+torchdata==0.7.1
+pydantic==2.13.4
 
-# 注意（兼容性踩坑，详见 README 环境节）：
-# - torch 默认源是 CPU 版，必须装 cu121：pip install torch==2.1.0+cu121 -f https://download.pytorch.org/whl/torch_stable.html
-# - dgl 2.2.1 需要 torchdata==0.7.1（0.11 移除了 datapipes），以及 pydantic
-# - torchdata 需手动降到 0.7.1；pydantic 需手动安装
+# 分子处理（dgllife 依赖）
+rdkit==2026.3.5
+
+# +cu121 轮子不在 PyPI 上，需先按各自官方源单独安装，再装本文件：
+#   pip install torch==2.1.0+cu121 -f https://download.pytorch.org/whl/torch_stable.html
+#   pip install dgl==2.2.1+cu121 -f https://data.dgl.ai/wheels/cu121/repo.html
+#   pip install torch-scatter==2.1.2+pt21cu121 -f https://data.pyg.org/whl/torch-2.1.0+cu121.html
+#   pip install -r requirements.txt
+#
+# 注意：
+#   - torch 默认源是 CPU 版，必须显式装 cu121 轮子；
+#   - dgl 2.2.1 需要 torchdata==0.7.1（0.11 起移除了 datapipes），否则 `import dgl` 失败。

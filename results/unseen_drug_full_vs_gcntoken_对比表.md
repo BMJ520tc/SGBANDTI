@@ -1,7 +1,7 @@
 # BioSNAP unseen_drug：Full（rooted K=2）vs GCN atom tokens — 逐 seed 对比
 
-> 对应 www.txt 补实验（路线B）。两配置同数据/同 150ep/同种子/同 token 形状与参数量，唯一差异 = 是否显式 rooted K-hop 子图。
-> Δ = Full − GCN-token。GCN-token seed42/52/62 为本机(4060)、seed72/82 为 B机(4090)；seed62 本机与 B机均跑过，取低值（本机 0.8743）。
+> 该对照用于量化 rooted K-hop 子图的作用。两配置同数据 / 同 150ep / 同种子 / 同 token 形状与参数量，唯一差异 = 是否显式 rooted K-hop 子图。
+> Δ = Full − GCN-token。GCN-token seed42/52/62 为本机(4060)、seed72/82 为 B机(4090)。seed62 在 B 机段被重复跑过（0.8807 / 0.8889，未保留产物），本表取留有完整产物的本机那次（0.8743 / 0.8832）；改用 B 机值的敏感性结果见 `run_manifest_gcn_tokens.md` §5。
 
 ## 对比表
 
@@ -23,9 +23,9 @@
 
 - AUROC：mean Δ +0.0033、4/5 seed 正 → 满足"多数 seed 为正"
 - AUPRC：mean Δ +0.0003、仅 2/5 seed 正 → **未满足**"两项指标均 ≥4/5 seed 正"
-- → 属 **情形 B**：small numerical advantage under unseen-drug, evidence not conclusive on AUPRC
+- → 结论：unseen-drug 上仅小幅数值优势，AUPRC 证据不足以下定论（small numerical advantage, evidence not conclusive on AUPRC）
 
-**对应论文表述（情形B）**：
+**论文中的对应表述**：
 > The rooted-subgraph configuration achieved a small numerical advantage under the unseen-drug setting (mean ΔAUROC +0.0033, positive in 4/5 seeds), although the AUPRC evidence was not conclusive.
 
 ## 结合 random-pair 结果（跨情形综合）

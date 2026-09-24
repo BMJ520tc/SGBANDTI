@@ -1,12 +1,12 @@
-# DrugBAN 基线证据包（审稿补充材料）
+# DrugBAN 基线证据包
 
-> 回应审稿意见："DrugBAN 决定两个随机划分中的最高均值，也直接涉及正文中的差值结论。然而当前实验包中没有 DrugBAN 源码版本、配置、五种子原值或预测文件。"
+> 背景：DrugBAN 决定两个随机划分中的最高均值，也直接涉及正文中的差值结论；而此前的实验包中没有 DrugBAN 源码版本、配置、五种子原值或预测文件。
 > 结论：**上述材料均在本地完整保留，现已直接补入本仓库，DrugBAN 不需要重跑。**
 > 整理日期：2026-09-23
 
 ## 0. 材料对照
 
-| 审稿意见要求 | 本文位置 |
+| 待核验项 | 本文位置 |
 |---|---|
 | 官方代码的准确 commit / release | §1 |
 | 本文适配代码或 patch | §2 + `baselines/DrugBAN/patches/drugban_adaptation.patch` |
@@ -119,7 +119,7 @@ git rev-parse HEAD:data/biosnap/random/train.csv   # → 4a0bc6514ea2a9da5fe37d7
 - 逐样本预测（4 设置 × 5 种子，配对 bootstrap 的输入）：
   `results/stats_input/{bindingdb_random,biosnap_random,biosnap_unseen_drug,biosnap_unseen_target}/DrugBAN/seed_{42,52,62,72,82}_y_pred.npy` 与对应 `_y_true.npy`
 - 原始训练日志：`baselines/DrugBAN/drugban_bindingdb.log`（BindingDB random）。
-- **如实说明**：BioSNAP 三个设置（random / unseen_drug / unseen_target）的 DrugBAN 训练日志当年未随包保存，现存材料为逐样本预测 + 逐种子汇总。若审稿人要求日志，需要定向补跑。
+- **如实说明**：BioSNAP 三个设置（random / unseen_drug / unseen_target）的 DrugBAN 训练日志未随包保存，现存材料为逐样本预测 + 逐种子汇总。如需原始日志，需要定向补跑。
 
 ## 7. 均值与 sample SD 的生成脚本
 

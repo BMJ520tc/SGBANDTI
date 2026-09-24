@@ -87,9 +87,10 @@ pip install torchdata==0.7.1
 - **BioSNAP**：正样本 = 已知药物–蛋白相互作用；负样本 = 未标注的随机药物–蛋白对（接近平衡，正 13,830 / 负 13,627）。
 - **BindingDB**：正样本 = 实验测得的结合记录；负样本 = 随机生成的未结合对（正 20,674 / 负 28,525，标签列为 Y：1 结合 / 0 未结合）。
 
-首次运行需重建子图缓存：
+首次运行需重建子图缓存（下述命令均在 `code/` 目录下执行，即仓库根目录先 `cd code`）：
 
 ```bash
+cd code
 python build_subgraph_cache.py --data biosnap --split random --hop 2 --use-nested nested
 python build_subgraph_cache.py --data biosnap --split random --hop 2 --use-nested flat
 python build_subgraph_cache.py --data biosnap --split unseen_drug --hop 2 --use-nested nested
@@ -104,6 +105,7 @@ python build_subgraph_cache.py --data bindingdb --split random --hop 2 --use-nes
 训练（5 种子 42–82，模型按**验证集 AUROC** 选最优）：
 
 ```bash
+cd code
 # BioSNAP random 主实验（定版：AUROC 0.9062±0.0019）
 python main.py --data biosnap --split random --hop 2 --seeds 42,52,62,72,82
 
@@ -123,6 +125,7 @@ python main.py --data bindingdb --split random --hop 2 --seeds 42,52,62,72,82
 统计与评价：
 
 ```bash
+cd code
 python aggregate_seeds.py --data biosnap --split random --hop 2        # 5 种子聚合
 python eval_with_ci.py --data biosnap --split random --hop 2 --seed 42 # bootstrap CI + 逐样本
 python eval_metrics.py --y-true ... --y-prob ... --threshold 0.5       # 统一指标校验
@@ -130,9 +133,10 @@ python eval_metrics.py --y-true ... --y-prob ... --threshold 0.5       # 统一�
 
 ## Pretrained Model（样本模型）
 
-`models/` 提供**一个代表模型**（SGBANDTI BioSNAP random seed42，best epoch 137），无需重训即可复现主实验数字（AUROC **0.9062** / AUPRC **0.9171**）：
+`models/` 提供**一个代表模型**（SGBANDTI BioSNAP random seed42，best epoch 137），无需重训即可复现该 **seed42** 的结果（AUROC **0.9062** / AUPRC **0.9171**；五种子均值见下表 0.9062±0.0019 / 0.9132±0.0043）：
 
 ```bash
+cd code
 python demo_eval.py        # 需先建好子图缓存（见 Data 节）
 ```
 
@@ -173,10 +177,10 @@ python demo_eval.py        # 需先建好子图缓存（见 Data 节）
 | 模型 | AUROC | AUPRC |
 |---|---|---|
 | **SGBANDTI** | **0.9062±0.0019** | 0.9132±0.0043 |
-| MolTrans | 0.8867±0.0045 | 0.8927±0.0048 |
-| MGNDTI | 0.8947±0.0019 | 0.8983±0.0042 |
+| MolTrans | 0.8867±0.0050 | 0.8927±0.0053 |
+| MGNDTI | 0.8947±0.0022 | 0.8983±0.0047 |
 
-**冷启动 unseen_drug**：SGBANDTI 0.8794±0.0019 为最优；**unseen_target**：RF 0.6979±0.0110 最优。
+**冷启动 unseen_drug**：SGBANDTI 0.8794±0.0019 为最优；**unseen_target**：RF 0.6979±0.0122 最优。
 
 ---
 

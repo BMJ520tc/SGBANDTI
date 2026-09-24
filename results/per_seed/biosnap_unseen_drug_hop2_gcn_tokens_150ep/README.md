@@ -19,13 +19,14 @@
 | 82 | 0.8776 | 0.8799 | 120 | B机(4090) |
 | **mean±SD** | **0.8760±0.0035** | **0.8818±0.0039** | | |
 
-> seed72/82 由 B机(4090) 跑（unseen_drug 反序段）；本机 seed42/52/62（4060）。seed62 本机与 B机均跑过，取值低者（本机 0.8743）。
+> seed72/82 由 B机(4090) 跑（该批次按 82→72→62→52→42 倒序执行）；本机 seed42/52/62（4060）。seed62 在 B 机段被重复跑过一次（AUROC 0.8807 / AUPRC 0.8889，best epoch 132，未保留产物）；本目录取**本机**那次（best epoch 143），依据是只有该次留有 result_metrics.pt / best checkpoint / 逐样本预测，而非按测试指标择低。改用 B 机值的敏感性数值见 `results/run_manifest_gcn_tokens.md` §5。
 
 ## 材料清单
 - [x] seed_summary.csv / seed_summary_stats.csv
 - [x] 五组 test_y_true.npy / test_y_pred.npy
 - [x] 五个 result_metrics.pt + best checkpoint + best_epoch_metrics.txt
-- [x] 运行日志：`run_bcombo_B机日志.log`（B机，16.8MB）+ 本机 seed42/52/62 训练日志
+- [x] 运行日志：`run_bcombo_B机日志.log`（B机组合日志，16.8MB；前半段为 BindingDB random 的 gcn_tokens 五种子，后半段为本设置 unseen_drug 的 82/72/62，52 未跑完）
+- [x] 本机 seed42/52/62 训练产物：即本目录 `seed_*/`（result_metrics.pt、best checkpoint、逐样本预测）；无独立本机日志文件随包
 - [x] 代码 commit：公开仓库 `08a9dbb`（本目录全部文件均由该提交引入）；训练发生在私有工作仓库 `e77cbcd`（该 commit 不在公开仓库中，仅作来源留痕）
 - [x] unseen_drug CSV SHA256（见下）
 
@@ -39,4 +40,4 @@ test.csv  14888e218560947d4919267367e37a3bde502218f3bfe67678c7fa29845026bf
 ## 与 Full 对照（unseen-drug）
 Full mean AUROC 0.8794±0.0019、AUPRC 0.8821±0.0026。
 Δ（Full−GCN-token）逐 seed：AUROC 4/5 正、mean +0.0033；AUPRC 2/5 正、mean +0.0003。
-判定：AUROC 满足 4/5 正，AUPRC 未满足 → 情形 B（small numerical advantage, not conclusive on AUPRC）。
+判定：AUROC 满足 4/5 正，AUPRC 未满足 → 仅小幅数值优势，AUPRC 证据不足以下定论（small numerical advantage, not conclusive on AUPRC）。

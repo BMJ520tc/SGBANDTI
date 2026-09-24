@@ -7,16 +7,19 @@ dependencies:
   - python=3.10
   - pip
   - pip:
+    # 与 code/requirements.txt 保持同一组版本
     - torch==2.1.0+cu121
     - dgl==2.2.1+cu121
     - torch-scatter==2.1.2+pt21cu121
     - torchdata==0.7.1
+    - pydantic==2.13.4
     - dgllife==0.3.2
     - torch-geometric==2.6.1
-    - rdkit
-    - numpy
-    - pandas
-    - scikit-learn
-    - yacs
-    - prettytable
-    - tqdm
+    - rdkit==2026.3.5
+    - numpy==1.26.4
+    - pandas==2.3.3
+    - scikit-learn==1.6.1
+    - matplotlib==3.9.4
+    - yacs==0.1.8
+    - prettytable==3.16.0
+    - tqdm==4.67.3

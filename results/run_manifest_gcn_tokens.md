@@ -1,12 +1,12 @@
-# GCN-token 对照运行清单（审稿补充材料）
+# GCN-token 对照运行清单
 
-> 回应审稿意见："实验包已有五种子预测、checkpoint 和模型结构，数值也可核验；但公开源码中没有 `MolecularGCNTokens` 类，训练入口也没有 `gcn_tokens` 选项。"
-> 结论：**原始源码已找回并补入公开仓库，本对照不需要重跑**。本文件即为审稿建议中的 run manifest（源码 commit、split hash、五个种子、结果路径）。
+> 背景：该对照的五种子预测、checkpoint 与模型结构均已归档、数值可核验；但公开源码中起初没有 `MolecularGCNTokens` 类，训练入口也没有 `gcn_tokens` 选项。
+> 结论：**原始源码已找回并补入公开仓库，本对照不需要重跑**。本文件即为该对照的运行清单（源码 commit、split hash、五个种子、结果路径）。
 > 整理日期：2026-09-23
 
 ---
 
-## 1. 源码：已补齐，且确认是当年训练所用的原始实现
+## 1. 源码：已补齐，且与产出该结果的实现一致
 
 ### 1.1 类定义与接入点
 
@@ -18,7 +18,7 @@
 | `code/main.py:24,53-57` | CLI `--ablation` choices 含 `gcn_tokens`；`apply_ablation()` 置 `USE_SUBGRAPH=False, USE_GCN_TOKENS=True` |
 | `code/test.py:61-76`、`code/eval_with_ci.py:34-64`、`code/aggregate_seeds.py:22` | 评测/汇总入口同样认得 `gcn_tokens` |
 
-补入 commit：**`7f559bf`**（本仓库）。投稿版 commit `08a9dbb` 中确实不存在该类 —— 审稿人的观察对当时的公开快照成立，本清单为补交。
+补入 commit：**`7f559bf`**（本仓库）。投稿版 commit `08a9dbb` 中确实不存在该类 —— 该观察对当时的公开快照成立，本清单为后续补交。
 
 ### 1.2 "找回的是原始源码、不是重写"的判据
 
@@ -31,7 +31,7 @@
 | `(lin1): Linear(in_features=384, out_features=128, bias=True)` | `self.lin1 = nn.Linear(num_layers * hidden, hidden)`（3×128=384 → 128） |
 | 输出 `[B, 290, 128]` 原子 token + 逐原子真实掩码 | `feats = x.view(B, self.max_nodes, self.output_feats)`；`mask = real_flag.view(B, self.max_nodes)` |
 
-→ 按审稿意见"如果找回原始源码，**不需要重跑**"，本题按源码找回情形处理。
+→ 原始源码已找回，故该对照**不需要重跑**。
 
 ---
 
@@ -147,11 +147,14 @@ unseen_drug 的逐 seed Δ（其均值 +0.0033 AUROC / +0.0003 AUPRC）与判定
 
 ## 5. 需要如实披露的两点
 
-1. **跨机器运行**：unseen_drug 的 seed 72/82 在 B 机（4090）、42/52/62 在本机（4060）运行；seed 62 两台机器都跑过，取数值较低的一方（本机 0.8743）。此披露与 `results/per_seed/biosnap_unseen_drug_hop2_gcn_tokens_150ep/README.md`、`results/unseen_drug_full_vs_gcntoken_对比表.md` 的既有记录一致。
-2. **250-epoch 配置缺中间产物**：只有逐样本预测，无 checkpoint / `result_metrics.pt`。若审稿人要求完整训练产物，该配置需要定向重跑（约 5 × 单次训练时长）；150-epoch 主对照不受影响。
+1. **跨机器运行**：unseen_drug 的五个种子分布在两台机器上——seed 42/52/62 在本机（RTX 4060），72/82 在 B 机（RTX 4090）。B 机批次按 **82 → 72 → 62 → 52 →（42）倒序**执行，实际完成 82/72/62 三个种子，52 未跑完、42 未开始；其中 **seed 62 两台机器各跑过一次**。
+   本表主值取**本机那次**（AUROC 0.8743 / AUPRC 0.8832，best epoch 143）。选取依据不是测试指标，而是该次运行留有完整产物（`result_metrics.pt`、best checkpoint、逐样本预测），B 机那次只留下日志中的一行测试值、无任何归档产物。
+   **敏感性**：若改用 B 机那次（AUROC 0.8807 / AUPRC 0.8889，best epoch 132），GCN-token 侧为 0.8773 ± 0.0039 / 0.8829 ± 0.0051，Δ（Full − GCN-token）均值由 +0.0033 / +0.0003 变为 **+0.0021 / −0.0009**，ΔAUPRC 逐 seed 为正的个数由 2/5 降为 **1/5**（ΔAUROC 仍为 4/5 正）。即结论方向不变（AUROC 小幅为正、AUPRC 不成立），但 AUPRC 侧对该选择敏感。
+   此披露与 `results/per_seed/biosnap_unseen_drug_hop2_gcn_tokens_150ep/README.md`、`results/unseen_drug_full_vs_gcntoken_对比表.md` 的既有记录一致。
+2. **250-epoch 配置缺中间产物**：只有逐样本预测，无 checkpoint / `result_metrics.pt`。如需完整训练产物，该配置需要定向重跑（约 5 × 单次训练时长）；150-epoch 主对照不受影响。
 
 ## 6. 结论
 
-- 源码（类 + config + 训练入口）已全部补入公开仓库，且经结构逐层比对确认与当年训练所用实现一致；
+- 源码（类 + config + 训练入口）已全部补入公开仓库，且经结构逐层比对确认与产出该结果的实现一致；
 - split、五种子原值、结果路径、机器来源均已记录在案；
-- 按审稿意见，"找回原始源码 → 不需要重跑"。**本控制实验不重跑**。
+- 原始源码已找回 → 不需要重跑。**本对照不重跑**。

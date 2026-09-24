@@ -25,3 +25,6 @@ dist/
 
 # Jupyter
 .ipynb_checkpoints/
+
+# 运行产物：子图缓存（首次运行由 build_subgraph_cache.py / demo_eval.py 生成，可重建）
+data/subgraph_cache/
