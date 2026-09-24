@@ -1,12 +1,23 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "SGBANDTI: Subgraph-GNN and Bilinear Attention for Drug-Target Interaction Prediction"
-# TODO: 引用信息待补全以下字段
+title: "ATBAN-DTI: Preserving Local Molecular Representations for Bilinear Drug–Target Interaction Prediction"
+abstract: "ATBAN-DTI is the model name used in the manuscript. SGBANDTI is retained as the historical repository and implementation identifier."
 authors:
-  - family-names: "YourFamilyName"
-    given-names: "YourGivenName"
-version: "v1.0.0"
-date-released: "2026-08-23"
+  - family-names: "Li"
+    given-names: "Wen"
+  - family-names: "Long"
+    given-names: "Quan"
+  - family-names: "Bao"
+    given-names: "Mengjie"
+  - family-names: "Fu"
+    given-names: "Yanxiu"
+  - family-names: "Wen"
+    given-names: "Yuebing"
+  - family-names: "Wang"
+    given-names: "Peng"
+repository-code: "https://github.com/BMJ520tc/SGBANDTI"
+version: "v1.0.2"
+date-released: "2026-09-24"
 license: "MIT"
 keywords:
   - drug-target interaction

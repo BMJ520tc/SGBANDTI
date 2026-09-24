@@ -3,7 +3,8 @@
 用法：
   python demo_eval.py                                # 用 models/ 下的样本模型
   python demo_eval.py --checkpoint path/to/model.pth # 自定义权重
-预期输出（样本模型 seed42）≈ AUROC 0.9062。
+预期输出为 **seed42 该种子**的指标（样本模型即 seed42 的 checkpoint）：AUROC 0.9062 / AUPRC 0.9171；
+五种子均值为 AUROC 0.9062±0.0019 / AUPRC 0.9132±0.0043（见 results/00_实验结果汇总.md）。
 """
 import argparse
 import os
@@ -54,5 +55,5 @@ y_true = np.asarray(y_true)
 y_prob = np.asarray(y_prob)
 print(f"样本模型: {ckpt}")
 print(f"测试样本数: {len(y_true)}")
-print(f"AUROC: {roc_auc_score(y_true, y_prob):.4f}  (seed42 ≈ 0.9062)")
-print(f"AUPRC: {average_precision_score(y_true, y_prob):.4f}  (seed42 ≈ 0.9132)")
+print(f"AUROC: {roc_auc_score(y_true, y_prob):.4f}  (seed42 单种子；五种子均值 0.9062±0.0019)")
+print(f"AUPRC: {average_precision_score(y_true, y_prob):.4f}  (seed42 单种子；五种子均值 0.9132±0.0043)")

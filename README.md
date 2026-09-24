@@ -1,6 +1,8 @@
 # SGBANDTI
 
-**Version**: v1.0.1（2026-09-08 投稿版）
+**Version**: v1.0.2（2026-09-24）
+
+> ATBAN-DTI is the model name used in the manuscript. SGBANDTI is retained as the historical repository and implementation identifier.
 
 SGBANDTI: **S**ubgraph-**G**NN and **B**ilinear **A**ttention for **D**rug-**T**arget **I**nteraction prediction.
 
@@ -51,26 +53,45 @@ SGBANDTI/
 
 ## Requirements
 
-**环境**：Python 3.10.20 · CUDA 12.1（cu121）· NVIDIA GPU（RTX 4060 / 4090 实测）· Linux / Windows 均可。
+**环境**：Python 3.10.20 · CUDA 12.1（cu121）· NVIDIA GPU（RTX 4060 / 4090 实测）。论文实验在 **Windows 11** 上完成，因此 **Windows 为精确复现环境**；**Linux 未经验证**——本仓库锁定的这套依赖组合只在 Windows 上测试过，Linux 对应的 DGL/torch 轮子组合未做验证，不建议直接套用。
 
-核心依赖：
+核心依赖（与 `code/requirements.txt`、`environment.yml` 三处一致）：
 
 | 包 | 版本 |
 |---|---|
 | torch | 2.1.0+cu121 |
 | dgl | 2.2.1+cu121 |
 | torch-scatter | 2.1.2+pt21cu121 |
-| torchdata | **0.7.1** |
+| torchdata | **0.7.1**（0.11 起移除 datapipes，dgl 2.2.1 会导入失败） |
+| pydantic | 2.13.4（dgl 运行时依赖） |
 | dgllife | 0.3.2 |
 | torch-geometric | 2.6.1 |
 | rdkit | 2026.3.5 |
-| numpy / pandas / scikit-learn / yacs / prettytable / tqdm | 标准 |
+| numpy / pandas / scikit-learn | 1.26.4 / 2.3.3 / 1.6.1 |
+| yacs / prettytable / tqdm / matplotlib | 0.1.8 / 3.16.0 / 4.67.3 / 3.9.4 |
+
+完整安装命令（`+cu121` 轮子不在 PyPI 上，需先按各自官方源装这三个；或直接用仓库根目录的 `environment.yml`）：
 
 ```bash
 pip install torch==2.1.0+cu121 -f https://download.pytorch.org/whl/torch_stable.html
 pip install dgl==2.2.1+cu121 -f https://data.dgl.ai/wheels/cu121/repo.html
 pip install torch-scatter==2.1.2+pt21cu121 -f https://data.pyg.org/whl/torch-2.1.0+cu121.html
-pip install torchdata==0.7.1
+pip install -r code/requirements.txt
+```
+
+环境自检与冒烟测试（不需要重训）：
+
+```bash
+cd code
+python check_env.py     # 依赖 / CUDA / 模型可实例化（参数应为 1,070,342）
+python demo_eval.py     # 需先建好子图缓存（见 Data 节）；首次运行会现场建缓存，耗时较长
+```
+
+从已归档的逐样本预测重建结果清单（不重跑训练）：
+
+```bash
+cd code
+python build_manifest.py    # 输出 results/results_manifest.csv，并校验五种子完整性
 ```
 
 ---
@@ -172,13 +193,14 @@ python demo_eval.py        # 需先建好子图缓存（见 Data 节）
 
 ### 关键结果（AUROC，mean±std）
 
-**BioSNAP random（5 种子）**
+**BioSNAP random（5 种子）** — 下表为部分代表性模型，完整 8 模型对比见 `results/00_实验结果汇总.md`
 
 | 模型 | AUROC | AUPRC |
 |---|---|---|
-| **SGBANDTI** | **0.9062±0.0019** | 0.9132±0.0043 |
-| MolTrans | 0.8867±0.0050 | 0.8927±0.0053 |
+| **DrugBAN** | **0.9100±0.0023** | **0.9172±0.0031** |
+| SGBANDTI | 0.9062±0.0019 | 0.9132±0.0043 |
 | MGNDTI | 0.8947±0.0022 | 0.8983±0.0047 |
+| MolTrans | 0.8867±0.0050 | 0.8927±0.0053 |
 
 **冷启动 unseen_drug**：SGBANDTI 0.8794±0.0019 为最优；**unseen_target**：RF 0.6979±0.0122 最优。
 

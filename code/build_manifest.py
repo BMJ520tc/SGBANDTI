@@ -34,6 +34,7 @@ COLS = ['dataset', 'split', 'model', 'config', 'auroc_mean', 'auroc_std', 'auprc
         'pred_file', 'true_file', 'source']
 
 ROWS = []
+KIND = []  # 与 ROWS 平行：'per_seed'（有逐种子数据）或 'transcribed'（转录值）
 
 
 def _pick(d, names):
@@ -45,19 +46,26 @@ def _pick(d, names):
 
 
 def _per_seed(dirpath, pred_names, true_names):
-    """目录下 seed_<s>/ 形式的逐样本预测 -> (auroc[5], auprc[5])；任一 seed 缺失返回 None。"""
-    a, p = [], []
+    """目录下 seed_<s>/ 形式的逐样本预测。
+
+    返回 (auroc[5], auprc[5], 实际使用的预测文件名)；任一 seed 缺失返回 None；
+    各 seed 取到的文件名不一致则报错（同一实验不应混用不同文件）。
+    """
+    a, p, names = [], [], set()
     for s in SEEDS:
         sd = dirpath / f'seed_{s}'
         yt = _pick(sd, true_names)
         yp = _pick(sd, pred_names)
         if yt is None or yp is None:
             return None
+        names.add(yp.name)
         y = np.load(yt).ravel()
         z = np.load(yp).ravel()
         a.append(roc_auc_score(y, z))
         p.append(average_precision_score(y, z))
-    return np.array(a), np.array(p)
+    if len(names) != 1:
+        sys.exit(f'错误：{dirpath} 各 seed 使用的预测文件不一致：{sorted(names)}')
+    return np.array(a), np.array(p), names.pop()
 
 
 def _per_seed_stats_input(setting, model):
@@ -87,8 +95,14 @@ def _per_seed_summary(dirpath):
             t.loc[SEEDS, 'AUPRC'].to_numpy(float))
 
 
-def add(dataset, split, model, config, per_seed, pred_file='', true_file='', source=''):
-    """per_seed = (auroc[5], auprc[5]) 或 None（None 表示无逐种子，由调用方随后填 mean±SD）。"""
+def add(dataset, split, model, config, per_seed, pred_file='', true_file='', source='', transcribed=False):
+    """per_seed = (auroc[5], auprc[5])。
+
+    取不到逐种子数据时（per_seed is None）必须是转录行（transcribed=True，调用方随即填入
+    mean±SD）；否则视为数据缺失，直接报错退出，避免静默写出空的指标行。
+    """
+    if per_seed is None and not transcribed:
+        sys.exit(f'错误：{dataset}/{split} {model} {config} 取不到逐种子数据，也未标注为转录行')
     row = dict.fromkeys(COLS, '')
     row.update(dataset=dataset, split=split, model=model, config=config)
     if per_seed is not None:
@@ -101,20 +115,24 @@ def add(dataset, split, model, config, per_seed, pred_file='', true_file='', sou
             row[f'auroc_s{s}'], row[f'auprc_s{s}'] = round(float(a[i]), 4), round(float(p[i]), 4)
     row['pred_file'], row['true_file'], row['source'] = pred_file, true_file, source
     ROWS.append(row)
+    KIND.append('transcribed' if per_seed is None else 'per_seed')
     return row
 
 
 def add_transcribed(dataset, split, model, auroc_mean, auroc_std, auprc_mean, auprc_std):
     """逐种子未保存的行：mean±SD 转录自 00_实验结果汇总.md。"""
-    row = add(dataset, split, model, 'full', None,
+    row = add(dataset, split, model, 'full', None, transcribed=True,
               source='00_实验结果汇总.md（mean±sample SD，ddof=1；逐 seed 未公开归档）')
     row.update(auroc_mean=auroc_mean, auroc_std=auroc_std, auprc_mean=auprc_mean, auprc_std=auprc_std)
 
 
 def add_stats_input(dataset, split, setting, model='SGBANDTI'):
     d = f'results/stats_input/{setting}/{model}'
-    add(dataset, split, model, 'full', _per_seed_stats_input(setting, model),
-        pred_file=d + '/', true_file=d + '/',
+    ps = _per_seed_stats_input(setting, model)
+    if ps is None:
+        sys.exit(f'错误：{d} 下缺少 seed_42/52/62/72/82 中某些 seed 的 _y_pred.npy 或 _y_true.npy，'
+                 f'不能生成空的指标行')
+    add(dataset, split, model, 'full', ps, pred_file=d + '/', true_file=d + '/',
         source=f'{d}/seed_*_y_pred.npy（逐样本重算）')
 
 
@@ -122,8 +140,9 @@ def add_per_seed(dataset, split, model, config, dirname):
     d = f'results/per_seed/{dirname}'
     a = _per_seed(RESULTS / 'per_seed' / dirname, PRED_NAMES, TRUE_NAMES)
     if a is not None:
-        add(dataset, split, model, config, a, pred_file=d + '/', true_file=d + '/',
-            source=f'{d}/seed_*/test_y_pred.npy（逐样本重算）')
+        au, ap_, pred_name = a
+        add(dataset, split, model, config, (au, ap_), pred_file=d + '/', true_file=d + '/',
+            source=f'{d}/seed_*/{pred_name}（逐样本重算）')
         return
     a = _per_seed_summary(RESULTS / 'per_seed' / dirname)
     if a is not None:
@@ -194,5 +213,19 @@ df = pd.DataFrame(ROWS, columns=COLS).round(4)
 missing = df['source'].eq('').sum()
 if missing:
     sys.exit(f'错误：{missing} 行缺少来源标注')
+
+# 写出前校验：逐种子行必须有完整的均值/SD/五种子；转录行必须有均值/SD
+MEAN_COLS = ['auroc_mean', 'auroc_std', 'auprc_mean', 'auprc_std']
+SEED_COLS = [f'auroc_s{s}' for s in SEEDS] + [f'auprc_s{s}' for s in SEEDS]
+empty = []
+for i, r in enumerate(ROWS):
+    need = MEAN_COLS + SEED_COLS if KIND[i] == 'per_seed' else MEAN_COLS
+    blank = [c for c in need if r[c] == '']
+    if blank:
+        empty.append(f"{r['dataset']}/{r['split']} {r['model']} {r['config']}: 缺 {', '.join(blank)}")
+if empty:
+    sys.exit('错误：以下行指标字段为空：\n  ' + '\n  '.join(empty))
+
+n_seed = KIND.count('per_seed')
 df.to_csv(OUT, index=False, encoding='utf-8')
-print(f'written: {OUT.relative_to(REPO)}  rows: {len(df)}')
+print(f'written: {OUT.relative_to(REPO)}  rows: {len(df)}  逐种子行 {n_seed}  转录行 {len(KIND) - n_seed}')
