@@ -1,8 +1,8 @@
-# SGBANDTI
+# ATBAN-DTI
 
 **Version**: v1.0.2（2026-09-24）
 
-> ATBAN-DTI is the model name used in the manuscript. SGBANDTI is retained as the historical repository and implementation identifier.
+> ATBAN-DTI is the model name used in the manuscript. SGBANDTI is retained as the historical project and implementation identifier.
 
 SGBANDTI: **S**ubgraph-**G**NN and **B**ilinear **A**ttention for **D**rug-**T**arget **I**nteraction prediction.
 
@@ -70,7 +70,7 @@ SGBANDTI/
 | numpy / pandas / scikit-learn | 1.26.4 / 2.3.3 / 1.6.1 |
 | yacs / prettytable / tqdm / matplotlib | 0.1.8 / 3.16.0 / 4.67.3 / 3.9.4 |
 
-完整安装命令（`+cu121` 轮子不在 PyPI 上，需先按各自官方源装这三个；或直接用仓库根目录的 `environment.yml`）：
+完整安装命令（`+cu121` 轮子不在 PyPI 上，需先按各自官方源装这三个）：
 
 ```bash
 pip install torch==2.1.0+cu121 -f https://download.pytorch.org/whl/torch_stable.html
@@ -208,7 +208,7 @@ python demo_eval.py        # 需先建好子图缓存（见 Data 节）
 
 ## Citation
 
-引用信息待补充（见 `CITATION.cff`）。
+Citation metadata are provided in `CITATION.cff`.
 
 ## License
 

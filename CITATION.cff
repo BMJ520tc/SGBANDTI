@@ -15,7 +15,7 @@ authors:
     given-names: "Yuebing"
   - family-names: "Wang"
     given-names: "Peng"
-repository-code: "https://github.com/BMJ520tc/SGBANDTI"
+repository-code: "https://github.com/BMJ520tc/ATBAN-DTI"
 version: "v1.0.2"
 date-released: "2026-09-24"
 license: "MIT"
